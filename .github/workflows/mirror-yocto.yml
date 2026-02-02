@@ -1,0 +1,22 @@
+name: Mirror Yocto Git Repos
+on:
+  schedule:
+    # Update the mirrors ever 4 hours, every day.
+    - cron:  '0 */4 * * *'
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-slim
+    steps:
+    - name: Mirror
+      run: |
+        env | sort
+        git clone --mirror "https://git.yoctoproject.org/meta-yocto"
+        ls -al
+        cd meta-yocto.git/
+        git remote add github "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/troth/meta-yocto.git"
+        git remote -v
+        echo git push --mirror github
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
